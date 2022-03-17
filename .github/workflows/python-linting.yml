@@ -1,0 +1,60 @@
+name: Python Linting
+
+on:
+  push:
+    branches-ignore: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: set up python 3.x
+      uses: actions/setup-python@v2
+      with:
+        # pulls latest version of python, alternatively specify exact version (i.e. 3.8 -> no quotes)
+        python-version: '3.x'
+
+    - name: install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install --upgrade wheel
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: linting
+      uses: programmingwithalex/pylinters@v1.4.2
+      with:
+        python-root: '.'
+        flake8-flags: '--count --select=E9,F63,F7,F82 --max-line-length=127 --show-source --statistics'
+        # --ignore-missing-imports: ignore all missing imports
+        # --disallow-untyped-defs: function definition without type annotations
+        # --disallow-incomplete-defs: partly annotated function definition
+        # --show-error-codes: add an error code to error messages
+        # --raise-exceptions: raise exception on fatal error
+        mypy-flags: |
+            --ignore-missing-imports
+            --disallow-untyped-defs
+            --disallow-incomplete-defs
+            --show-error-codes
+            --raise-exceptions
+        fail-on-isort: false
+
+    - name: commit isort changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add -A && git diff-index --cached --quiet HEAD || git commit -m 'isort'
+    - name: push isort changes
+      uses: ad-m/github-push-action@v0.5.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+
+    - name: Test with pytest
+      run: |
+        if [ -d tests ] || [ -d test ]; then python -m pytest; fi

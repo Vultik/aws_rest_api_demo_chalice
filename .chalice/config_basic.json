@@ -1,0 +1,22 @@
+{
+  "version": "2.0",
+  "app_name": "chalice-demo",
+  "api_gateway_endpoint_type": "REGIONAL",
+  "environment_variables": {
+    "APP_TABLE_NAME": "todo-table",
+    "USERS_TABLE_NAME": "users-table"
+  },
+  "stages": {
+    "dev": {
+      "api_gateway_stage": "api",
+      "autogen_policy": false,
+      "iam_policy_file": "policy_no_secrets_manager.json"
+    },
+    "prod": {
+      "api_gateway_stage": "api",
+      "autogen_policy": false,
+      "iam_policy_file": "policy_no_secrets_manager.json",
+      "api_gateway_policy_file": "resource_policy_whitelist_ips.json"
+    }
+  }
+}
