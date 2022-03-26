@@ -1,6 +1,6 @@
 # aws_rest_api_demo_chalice
 
-Copyright (c) 2021, programmingwithalex
+Copyright (c) 2021, [programmingwithalex](https://github.com/programmingwithalex)
 
 ## General Info
 
